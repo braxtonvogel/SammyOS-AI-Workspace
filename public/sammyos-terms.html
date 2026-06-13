@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terms of Service — Sammy OS</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #080809;
+      --surface:   #111114;
+      --border:    #1e1e22;
+      --text:      #c8c8d0;
+      --text-dim:  #666;
+      --accent:    #6366f1;
+      --accent-lo: rgba(99,102,241,0.12);
+      --heading:   #e0e0e0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 15px;
+      line-height: 1.75;
+      padding: 0 16px 80px;
+    }
+
+    /* grid background */
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(99,102,241,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99,102,241,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    .wrap {
+      position: relative; z-index: 1;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    /* top bar */
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 28px 0 48px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 48px;
+    }
+
+    .logo {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 700; color: #fff;
+      box-shadow: 0 0 20px rgba(99,102,241,0.3);
+      flex-shrink: 0;
+      text-decoration: none;
+    }
+
+    .logo-text {
+      font-size: 16px; font-weight: 700;
+      color: var(--heading); letter-spacing: -0.01em;
+    }
+
+    .logo-sub {
+      font-size: 12px; color: var(--text-dim); margin-top: 1px;
+    }
+
+    .doc-badge {
+      margin-left: auto;
+      font-size: 11px; font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-lo);
+      border: 1px solid rgba(99,102,241,0.25);
+      border-radius: 20px;
+      padding: 4px 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    h1 {
+      font-size: 32px; font-weight: 800;
+      color: var(--heading);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+
+    .meta {
+      font-size: 13px; color: var(--text-dim);
+      margin-bottom: 40px;
+    }
+
+    /* critical banner */
+    .banner {
+      background: rgba(239,68,68,0.07);
+      border: 1px solid rgba(239,68,68,0.2);
+      border-left: 3px solid #ef4444;
+      border-radius: 8px;
+      padding: 16px 18px;
+      margin-bottom: 48px;
+      font-size: 14px;
+      color: #fca5a5;
+      line-height: 1.65;
+    }
+
+    .banner strong { color: #f87171; }
+
+    h2 {
+      font-size: 13px; font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 48px 0 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h2:first-of-type { margin-top: 0; }
+
+    p { margin-bottom: 14px; color: var(--text); }
+    p:last-child { margin-bottom: 0; }
+
+    ul {
+      margin: 0 0 14px 0;
+      padding-left: 20px;
+      color: var(--text);
+    }
+
+    ul li { margin-bottom: 8px; }
+
+    strong { color: var(--heading); font-weight: 600; }
+
+    a { color: var(--accent); text-decoration: underline;
+        text-decoration-color: rgba(99,102,241,0.35); }
+    a:hover { text-decoration-color: var(--accent); }
+
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px 26px;
+      margin-bottom: 12px;
+    }
+
+    .section h2 {
+      margin-top: 0;
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 14px;
+    }
+
+    footer {
+      margin-top: 64px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-dim);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 24px;
+      align-items: center;
+    }
+
+    footer a { color: #555; text-decoration: none; }
+    footer a:hover { color: var(--accent); }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 24px; }
+      .section { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a class="logo" href="https://braxtonvogel.com">S</a>
+    <div>
+      <div class="logo-text">Sammy OS</div>
+      <div class="logo-sub">by Braxton Vogel</div>
+    </div>
+    <span class="doc-badge">Terms of Service</span>
+  </div>
+
+  <h1>Terms of Service</h1>
+  <p class="meta">Effective date: June 11, 2026 &nbsp;·&nbsp; Last updated: June 11, 2026</p>
+
+  <div class="banner">
+    <strong>Important:</strong> Sammy OS is a <strong>personal portfolio project</strong> built
+    and maintained by a single developer (Braxton Vogel) as a demonstration of software
+    engineering skills. It is provided free of charge, with no guarantees of uptime, data
+    retention, or continued availability. By creating an account you acknowledge and accept
+    these limitations.
+  </div>
+
+  <div class="section">
+    <h2>1. Acceptance of Terms</h2>
+    <p>By accessing or using Sammy OS ("the App", "the Service"), you agree to be bound by
+    these Terms of Service ("Terms"). If you do not agree to these Terms, do not use the
+    Service. Your continued use of the Service after any changes to these Terms constitutes
+    acceptance of those changes.</p>
+    <p>You must be at least 13 years of age to use this Service. By using the Service, you
+    represent that you meet this requirement.</p>
+  </div>
+
+  <div class="section">
+    <h2>2. Description of Service</h2>
+    <p>Sammy OS is an AI-powered desktop productivity application that provides features
+    including but not limited to: AI chat assistance, screen sharing, audio transcription,
+    a knowledge vault for file storage and retrieval, and AI-assisted research tools.</p>
+    <p>The Service integrates with third-party AI providers (including Groq, Google Gemini,
+    Cerebras, and others). The availability and behavior of these integrations is subject to
+    the terms and limitations of those third-party providers, which are outside the control
+    of Braxton Vogel.</p>
+  </div>
+
+  <div class="section">
+    <h2>3. Account Registration</h2>
+    <p>To use the Service you must create an account with a valid email address and password.
+    You are responsible for:</p>
+    <ul>
+      <li>Maintaining the confidentiality of your account credentials</li>
+      <li>All activity that occurs under your account</li>
+      <li>Notifying us immediately of any unauthorized use of your account</li>
+      <li>Ensuring the accuracy of the information you provide</li>
+    </ul>
+    <p>We reserve the right to terminate accounts at any time, for any reason, without notice.</p>
+  </div>
+
+  <div class="section">
+    <h2>4. API Keys and Third-Party Services</h2>
+    <p>The Service allows you to store your own third-party API keys (such as Groq, Google
+    Gemini, Cerebras, OpenAI, and Anthropic keys). By storing API keys in the Service:</p>
+    <ul>
+      <li>You accept full responsibility for any usage charges incurred on those keys</li>
+      <li>You acknowledge that your keys are encrypted before storage but that no encryption
+          system is guaranteed to be unbreakable</li>
+      <li>You agree not to store API keys that belong to another person or organization
+          without their explicit permission</li>
+    </ul>
+    <p>Braxton Vogel is not responsible for any unauthorized access to your API keys or any
+    charges resulting from such access.</p>
+  </div>
+
+  <div class="section">
+    <h2>5. Acceptable Use</h2>
+    <p>You agree not to use the Service to:</p>
+    <ul>
+      <li>Violate any applicable local, state, national, or international law</li>
+      <li>Harass, abuse, or harm any person</li>
+      <li>Generate, distribute, or store illegal content of any kind</li>
+      <li>Attempt to reverse-engineer, compromise, or gain unauthorized access to the
+          Service's backend systems</li>
+      <li>Use the Service in any way that could damage, disable, or impair the Service
+          or interfere with other users</li>
+      <li>Attempt to circumvent rate limits or abuse the free AI provider rotation</li>
+    </ul>
+    <p>Violation of these terms may result in immediate account termination.</p>
+  </div>
+
+  <div class="section">
+    <h2>6. Disclaimer of Warranties</h2>
+    <p><strong>THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF
+    ANY KIND, EITHER EXPRESS OR IMPLIED.</strong> To the fullest extent permitted by law,
+    Braxton Vogel disclaims all warranties including, without limitation:</p>
+    <ul>
+      <li>Any implied warranty of merchantability or fitness for a particular purpose</li>
+      <li>Any warranty that the Service will be uninterrupted, error-free, or secure</li>
+      <li>Any warranty regarding the accuracy, reliability, or completeness of any
+          content generated by the Service's AI features</li>
+      <li>Any warranty that data stored in the Service will not be lost</li>
+    </ul>
+    <p>AI-generated content may be inaccurate, incomplete, or misleading. Do not rely on
+    it for legal, medical, financial, or other professional advice.</p>
+  </div>
+
+  <div class="section">
+    <h2>7. Limitation of Liability</h2>
+    <p><strong>TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, BRAXTON VOGEL SHALL NOT
+    BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES</strong>,
+    including without limitation loss of data, loss of profits, or loss of business, arising
+    out of or in connection with your use of the Service, even if advised of the possibility
+    of such damages.</p>
+    <p>In jurisdictions that do not allow the exclusion of certain warranties or the limitation
+    of certain damages, the above limitations may not apply to you.</p>
+  </div>
+
+  <div class="section">
+    <h2>8. Data and Privacy</h2>
+    <p>Your use of the Service is also governed by our
+    <a href="https://braxtonvogel.com/sammyos-privacy">Privacy Policy</a>, which is
+    incorporated into these Terms by reference. Please review the Privacy Policy to
+    understand our practices.</p>
+    <p><strong>Important:</strong> This is a portfolio project. Do not store sensitive,
+    confidential, or irreplaceable data in the Service. You should maintain your own
+    backups of any important files you upload to the Knowledge Vault.</p>
+  </div>
+
+  <div class="section">
+    <h2>9. Service Availability and Termination</h2>
+    <p>As a portfolio project, Sammy OS may be modified, suspended, or discontinued at
+    any time without notice. Braxton Vogel reserves the right to:</p>
+    <ul>
+      <li>Take the Service offline temporarily or permanently</li>
+      <li>Delete user accounts and associated data</li>
+      <li>Modify or remove features at any time</li>
+    </ul>
+    <p>We will make reasonable efforts to provide notice of significant changes but are
+    not obligated to do so.</p>
+  </div>
+
+  <div class="section">
+    <h2>10. Intellectual Property</h2>
+    <p>Sammy OS and its original code, design, and content are the intellectual property
+    of Braxton Vogel. The source code is available on
+    <a href="https://github.com/braxtonvogel/SammyOS-AI-Workspace" target="_blank" rel="noreferrer">GitHub</a>
+    and is shared for portfolio and educational purposes.</p>
+    <p>You retain ownership of any content you upload to the Service. By uploading content,
+    you grant Braxton Vogel a limited license to store and process that content solely for
+    the purpose of providing the Service to you.</p>
+  </div>
+
+  <div class="section">
+    <h2>11. Governing Law</h2>
+    <p>These Terms shall be governed by and construed in accordance with the laws of the
+    State of Texas, United States, without regard to its conflict of law provisions. Any
+    disputes arising under these Terms shall be subject to the exclusive jurisdiction of
+    the courts located in Texas.</p>
+  </div>
+
+  <div class="section">
+    <h2>12. Changes to Terms</h2>
+    <p>We reserve the right to modify these Terms at any time. Changes will be posted at
+    this URL with an updated effective date. Continued use of the Service after changes
+    are posted constitutes your acceptance of the revised Terms.</p>
+  </div>
+
+  <div class="section">
+    <h2>13. Contact</h2>
+    <p>For questions about these Terms, contact Braxton Vogel at
+    <a href="https://braxtonvogel.com">braxtonvogel.com</a>.</p>
+  </div>
+
+  <footer>
+    <span>© 2026 Braxton Vogel</span>
+    <a href="https://braxtonvogel.com/sammyos-privacy">Privacy Policy</a>
+    <a href="https://braxtonvogel.com">Portfolio</a>
+    <a href="https://github.com/braxtonvogel/SammyOS-AI-Workspace" target="_blank" rel="noreferrer">GitHub</a>
+    <span style="margin-left:auto">Sammy OS is a portfolio project</span>
+  </footer>
+
+</div>
+</body>
+</html>

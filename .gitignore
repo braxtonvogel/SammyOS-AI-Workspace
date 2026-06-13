@@ -1,0 +1,5 @@
+launcher.log
+launcher_helper.vbs
+.env.local
+
+node_modules/

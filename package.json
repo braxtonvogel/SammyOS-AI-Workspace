@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "next": "^15.3.8",
+    "pdf-parse": "^2.4.5"
+  },
+  "devDependencies": {
+    "@types/pdf-parse": "^1.1.5"
+  }
+}

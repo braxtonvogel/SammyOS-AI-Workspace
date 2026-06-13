@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Sammy OS</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #080809;
+      --surface:   #111114;
+      --border:    #1e1e22;
+      --text:      #c8c8d0;
+      --text-dim:  #666;
+      --accent:    #6366f1;
+      --accent-lo: rgba(99,102,241,0.12);
+      --heading:   #e0e0e0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 15px;
+      line-height: 1.75;
+      padding: 0 16px 80px;
+    }
+
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(99,102,241,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99,102,241,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    .wrap {
+      position: relative; z-index: 1;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 28px 0 48px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 48px;
+    }
+
+    .logo {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 700; color: #fff;
+      box-shadow: 0 0 20px rgba(99,102,241,0.3);
+      flex-shrink: 0;
+      text-decoration: none;
+    }
+
+    .logo-text { font-size: 16px; font-weight: 700; color: var(--heading); letter-spacing: -0.01em; }
+    .logo-sub  { font-size: 12px; color: var(--text-dim); margin-top: 1px; }
+
+    .doc-badge {
+      margin-left: auto;
+      font-size: 11px; font-weight: 600;
+      color: #34d399;
+      background: rgba(52,211,153,0.1);
+      border: 1px solid rgba(52,211,153,0.2);
+      border-radius: 20px;
+      padding: 4px 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    h1 {
+      font-size: 32px; font-weight: 800;
+      color: var(--heading);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+
+    .meta { font-size: 13px; color: var(--text-dim); margin-bottom: 40px; }
+
+    .banner {
+      background: rgba(52,211,153,0.05);
+      border: 1px solid rgba(52,211,153,0.15);
+      border-left: 3px solid #34d399;
+      border-radius: 8px;
+      padding: 16px 18px;
+      margin-bottom: 48px;
+      font-size: 14px;
+      color: #6ee7b7;
+      line-height: 1.65;
+    }
+
+    .banner strong { color: #34d399; }
+
+    h2 {
+      font-size: 13px; font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    p { margin-bottom: 14px; }
+    p:last-child { margin-bottom: 0; }
+
+    ul { margin: 0 0 14px 20px; }
+    ul li { margin-bottom: 8px; }
+
+    strong { color: var(--heading); font-weight: 600; }
+    a { color: var(--accent); text-decoration: underline; text-decoration-color: rgba(99,102,241,0.35); }
+    a:hover { text-decoration-color: var(--accent); }
+
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px 26px;
+      margin-bottom: 12px;
+    }
+
+    .section h2 { margin-top: 0; }
+
+    /* data table */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0 4px;
+      font-size: 13px;
+    }
+
+    .data-table th {
+      text-align: left;
+      color: var(--text-dim);
+      font-weight: 600;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0 12px 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .data-table td {
+      padding: 10px 12px 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      vertical-align: top;
+      color: var(--text);
+    }
+
+    .data-table tr:last-child td { border-bottom: none; }
+
+    .tag {
+      display: inline-block;
+      font-size: 10px; font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+    }
+
+    .tag-yes  { background: rgba(52,211,153,0.1);  color: #34d399; }
+    .tag-no   { background: rgba(239,68,68,0.08);  color: #f87171; }
+    .tag-enc  { background: rgba(99,102,241,0.1);  color: #a5b4fc; }
+
+    footer {
+      margin-top: 64px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-dim);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 24px;
+      align-items: center;
+    }
+
+    footer a { color: #555; text-decoration: none; }
+    footer a:hover { color: var(--accent); }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 24px; }
+      .section { padding: 18px; }
+      .data-table { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a class="logo" href="https://braxtonvogel.com">S</a>
+    <div>
+      <div class="logo-text">Sammy OS</div>
+      <div class="logo-sub">by Braxton Vogel</div>
+    </div>
+    <span class="doc-badge">Privacy Policy</span>
+  </div>
+
+  <h1>Privacy Policy</h1>
+  <p class="meta">Effective date: June 11, 2026 &nbsp;·&nbsp; Last updated: June 11, 2026</p>
+
+  <div class="banner">
+    <strong>Short version:</strong> Sammy OS collects only what it needs to function.
+    Your files and chat history stay on your machine. API keys are encrypted before storage.
+    No personal data is sold or shared with advertisers. This is a portfolio project — not
+    a commercial product — so please do not store sensitive or irreplaceable information.
+  </div>
+
+  <div class="section">
+    <h2>1. Who We Are</h2>
+    <p>Sammy OS is a personal portfolio project developed by <strong>Braxton Vogel</strong>,
+    a software engineering student at Sam Houston State University. References to "we", "us",
+    or "our" in this policy refer to Braxton Vogel individually.</p>
+    <p>Contact: <a href="https://braxtonvogel.com">braxtonvogel.com</a></p>
+  </div>
+
+  <div class="section">
+    <h2>2. What Data We Collect</h2>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Why</th>
+          <th>Where stored</th>
+          <th>Encrypted</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Email address</strong></td>
+          <td>Account identity and login</td>
+          <td>Upstash Redis (cloud)</td>
+          <td><span class="tag tag-no">No</span></td>
+        </tr>
+        <tr>
+          <td><strong>Password</strong></td>
+          <td>Authentication</td>
+          <td>Upstash Redis (cloud)</td>
+          <td><span class="tag tag-enc">Hashed (bcrypt)</span></td>
+        </tr>
+        <tr>
+          <td><strong>API keys</strong></td>
+          <td>Powering AI features</td>
+          <td>Upstash Redis (cloud)</td>
+          <td><span class="tag tag-enc">Encrypted at rest</span></td>
+        </tr>
+        <tr>
+          <td><strong>Session token</strong></td>
+          <td>Keeping you logged in</td>
+          <td>Redis + your device (localStorage)</td>
+          <td><span class="tag tag-enc">Hashed reference</span></td>
+        </tr>
+        <tr>
+          <td><strong>Vault files</strong></td>
+          <td>Knowledge Vault feature</td>
+          <td>Your local machine only</td>
+          <td><span class="tag tag-yes">Local only</span></td>
+        </tr>
+        <tr>
+          <td><strong>Chat history</strong></td>
+          <td>Conversation continuity</td>
+          <td>Your local machine only</td>
+          <td><span class="tag tag-yes">Local only</span></td>
+        </tr>
+        <tr>
+          <td><strong>Usage counts</strong></td>
+          <td>Portfolio dashboard stats</td>
+          <td>Upstash Redis (cloud)</td>
+          <td><span class="tag tag-yes">Aggregate only</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top:16px; font-size:13px; color: var(--text-dim);">
+      Usage counts are strictly aggregate — total messages sent, total research reports
+      started, etc. No message content, file names, or personally identifying information
+      is included in telemetry.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>3. What We Do NOT Collect</h2>
+    <ul>
+      <li>The content of your conversations with Sam</li>
+      <li>The contents or names of files in your Knowledge Vault</li>
+      <li>Screenshots or screen recordings taken by the screen-share feature</li>
+      <li>Audio transcripts from the transcription feature</li>
+      <li>Your IP address (beyond what Vercel's infrastructure logs automatically)</li>
+      <li>Browsing history or behavior outside the App</li>
+    </ul>
+    <p>All AI conversations and file data are processed locally on your machine and are
+    never transmitted to our servers.</p>
+  </div>
+
+  <div class="section">
+    <h2>4. Third-Party AI Providers</h2>
+    <p>When you send a message to Sam, your message is sent to a third-party AI provider
+    (Groq, Google Gemini, Cerebras, OpenAI, Anthropic, or others depending on your
+    settings). These requests are made directly from the app using your API keys. Each
+    provider has its own privacy policy governing how they handle your prompts:</p>
+    <ul>
+      <li><a href="https://groq.com/privacy-policy/" target="_blank" rel="noreferrer">Groq Privacy Policy</a></li>
+      <li><a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">Google Privacy Policy</a></li>
+      <li><a href="https://openai.com/policies/privacy-policy" target="_blank" rel="noreferrer">OpenAI Privacy Policy</a></li>
+      <li><a href="https://www.anthropic.com/privacy" target="_blank" rel="noreferrer">Anthropic Privacy Policy</a></li>
+    </ul>
+    <p>We do not control how these providers handle data sent to them. Review their
+    policies before using their services.</p>
+  </div>
+
+  <div class="section">
+    <h2>5. Data Storage and Security</h2>
+    <p>Account data (email, hashed password, encrypted API keys) is stored in
+    <a href="https://upstash.com" target="_blank" rel="noreferrer">Upstash Redis</a>,
+    a managed cloud database. Upstash operates under its own
+    <a href="https://upstash.com/trust/privacy.pdf" target="_blank" rel="noreferrer">privacy policy</a>
+    and maintains SOC 2 compliance.</p>
+    <p>We take reasonable measures to protect your data, including password hashing with
+    bcrypt and encryption of stored API keys. However, <strong>no system is 100% secure</strong>.
+    We cannot guarantee the absolute security of your information and are not liable for
+    unauthorized access resulting from circumstances beyond our reasonable control.</p>
+  </div>
+
+  <div class="section">
+    <h2>6. Data Sharing</h2>
+    <p>We do not sell, rent, or share your personal data with any third party for
+    marketing or advertising purposes. Data is only shared in the following circumstances:</p>
+    <ul>
+      <li><strong>AI providers</strong> — your prompts are sent to the provider you have
+          configured, as described in Section 4</li>
+      <li><strong>Legal requirements</strong> — if required by law, court order, or
+          governmental authority</li>
+      <li><strong>Infrastructure</strong> — Upstash (database) and Vercel (hosting)
+          necessarily process data as part of providing the Service</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>7. Data Retention and Deletion</h2>
+    <p>Your account data is retained in Redis for as long as your account exists.
+    Session tokens expire automatically after 30 days of inactivity.</p>
+    <p>To request deletion of your account and all associated data, contact us at
+    <a href="https://braxtonvogel.com">braxtonvogel.com</a>. We will process deletion
+    requests within a reasonable timeframe.</p>
+    <p>Local data (chat history, vault files) is stored only on your device and can be
+    deleted by you at any time by removing the relevant files from your installation
+    directory.</p>
+  </div>
+
+  <div class="section">
+    <h2>8. Children's Privacy</h2>
+    <p>The Service is not directed at children under the age of 13. We do not knowingly
+    collect personal information from children under 13. If you believe a child under 13
+    has provided us with personal information, please contact us so we can delete it.</p>
+  </div>
+
+  <div class="section">
+    <h2>9. Your Rights</h2>
+    <p>Depending on your location, you may have certain rights regarding your personal data,
+    including the right to access, correct, or delete your data. To exercise any of these
+    rights, contact us at <a href="https://braxtonvogel.com">braxtonvogel.com</a>.</p>
+  </div>
+
+  <div class="section">
+    <h2>10. Changes to This Policy</h2>
+    <p>We may update this Privacy Policy from time to time. Changes will be posted at this
+    URL with an updated effective date. We encourage you to review this policy periodically.
+    Continued use of the Service after changes are posted constitutes your acceptance of
+    the revised policy.</p>
+  </div>
+
+  <footer>
+    <span>© 2026 Braxton Vogel</span>
+    <a href="https://braxtonvogel.com/sammyos-terms">Terms of Service</a>
+    <a href="https://braxtonvogel.com">Portfolio</a>
+    <a href="https://github.com/braxtonvogel/SammyOS-AI-Workspace" target="_blank" rel="noreferrer">GitHub</a>
+    <span style="margin-left:auto">Sammy OS is a portfolio project</span>
+  </footer>
+
+</div>
+</body>
+</html>
