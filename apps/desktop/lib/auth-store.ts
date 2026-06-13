@@ -1,12 +1,11 @@
-// lib/auth-store.ts
-// Persists login token + user info to localStorage.
-// On app start, if a token exists, silently fetch the latest API keys
-// from the backend and inject them into the running environment.
-
+"use client";
 import { create } from "zustand";
 
-// The URL of your nexus-analyzer backend (same one you already have)
-const BACKEND = process.env.NEXT_PUBLIC_NEXUS_ANALYZER_URL ?? "https://nexus-analyzer-three.vercel.app";
+const BACKEND =
+  process.env.NEXT_PUBLIC_NEXUS_ANALYZER_URL ??
+  "https://nexus-analyzer-three.vercel.app";
+
+const STORAGE_KEY = "sammy_auth";
 
 export interface AuthUser {
   userId: string;
@@ -19,32 +18,48 @@ interface AuthStore {
   user: AuthUser | null;
   loading: boolean;
   error: string | null;
-
   login: (email: string, password: string) => Promise<boolean>;
-  register: (email: string, password: string, apiKeys: Record<string, string>) => Promise<boolean>;
+  register: (
+    email: string,
+    password: string,
+    apiKeys: Record<string, string>
+  ) => Promise<boolean>;
   logout: () => void;
-  updateKeys: (keys: Record<string, string>) => Promise<boolean>;
   hydrate: () => Promise<void>;
   clearError: () => void;
 }
 
 function persist(user: AuthUser) {
   if (typeof window !== "undefined") {
-    localStorage.setItem("sammy_auth", JSON.stringify(user));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
   }
 }
 
 function loadPersisted(): AuthUser | null {
   if (typeof window === "undefined") return null;
   try {
-    const raw = localStorage.getItem("sammy_auth");
+    const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : null;
   } catch {
     return null;
   }
 }
 
-export const useAuthStore = create<AuthStore>((set, get) => ({
+async function fetchKeys(token: string): Promise<Record<string, string>> {
+  try {
+    const res = await fetch(`${BACKEND}/api/auth/keys`, {
+      headers: { "x-sammy-token": token },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) return {};
+    const data = await res.json();
+    return data.keys ?? {};
+  } catch {
+    return {};
+  }
+}
+
+export const useAuthStore = create<AuthStore>((set) => ({
   user: null,
   loading: false,
   error: null,
@@ -55,24 +70,22 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     const persisted = loadPersisted();
     if (!persisted?.token) return;
 
-    // Silently refresh keys from backend on app start
-    try {
-      const res = await fetch(`${BACKEND}/api/auth/keys`, {
-        headers: { "x-sammy-token": persisted.token },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        const user = { ...persisted, apiKeys: data.apiKeys };
-        persist(user);
-        set({ user });
-      } else {
-        // Token expired — clear it
-        localStorage.removeItem("sammy_auth");
-      }
-    } catch {
-      // Network offline — use cached keys
-      set({ user: persisted });
+    // Show cached user immediately so the app isn't blocked
+    set({ user: persisted });
+
+    // Then silently refresh keys in background
+    const keys = await fetchKeys(persisted.token);
+
+    if (Object.keys(keys).length === 0) {
+      // Empty means either offline or token expired
+      // Only clear if we got a definitive 401 — fetchKeys swallows errors
+      // so we keep the cached user to stay offline-friendly
+      return;
     }
+
+    const updated = { ...persisted, apiKeys: keys };
+    persist(updated);
+    set({ user: updated });
   },
 
   login: async (email, password) => {
@@ -88,11 +101,19 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         set({ error: data.error ?? "Login failed", loading: false });
         return false;
       }
+
+      // Login response already returns apiKeys from the server
+      const keys = data.apiKeys ?? {};
+
+      // Also do a fresh GET to make sure we have the latest
+      const freshKeys = await fetchKeys(data.token);
+      const finalKeys = Object.keys(freshKeys).length > 0 ? freshKeys : keys;
+
       const user: AuthUser = {
         userId: data.userId,
         email: data.email,
         token: data.token,
-        apiKeys: data.apiKeys ?? {},
+        apiKeys: finalKeys,
       };
       persist(user);
       set({ user, loading: false });
@@ -116,6 +137,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         set({ error: data.error ?? "Registration failed", loading: false });
         return false;
       }
+
       const user: AuthUser = {
         userId: data.userId,
         email: data.email,
@@ -131,32 +153,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     }
   },
 
-  updateKeys: async (keys) => {
-    const { user } = get();
-    if (!user) return false;
-    try {
-      const res = await fetch(`${BACKEND}/api/auth/keys`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "x-sammy-token": user.token,
-        },
-        body: JSON.stringify({ apiKeys: keys }),
-      });
-      if (res.ok) {
-        const updated = { ...user, apiKeys: keys };
-        persist(updated);
-        set({ user: updated });
-        return true;
-      }
-      return false;
-    } catch {
-      return false;
-    }
-  },
-
   logout: () => {
-    if (typeof window !== "undefined") localStorage.removeItem("sammy_auth");
+    if (typeof window !== "undefined") localStorage.removeItem(STORAGE_KEY);
     set({ user: null });
   },
 }));

@@ -199,15 +199,15 @@ export default function SettingsPage() {
 
     // Check whether user already has a custom key saved
     if (user?.token) {
-      fetch(`${process.env.NEXT_PUBLIC_NEXUS_ANALYZER_URL}/api/auth/keys`, {
-        headers: { "x-sammy-token": user.token },
-      }).then((r) => r.json()).then((d) => {
-        if (d.keys?.CUSTOM_API_KEY) {
-          setExistingCustomKey(true);
-          setCustomApiUrl(d.keys.CUSTOM_API_URL ?? "");
-        }
-      }).catch(() => {});
+  fetch(`${process.env.NEXT_PUBLIC_NEXUS_ANALYZER_URL}/api/auth/keys`, {
+    headers: { "x-sammy-token": user.token },
+  }).then((r) => r.json()).then((d) => {
+    if (d.keys?.CUSTOM_API_KEY) {
+      setExistingCustomKey(true);
+      setCustomApiUrl(d.keys.CUSTOM_API_URL ?? "");
     }
+  }).catch(() => {});
+}
   }, [user]);
 
   const checkOllama = async () => {
@@ -240,42 +240,49 @@ export default function SettingsPage() {
   };
 
   const saveCustomKey = async () => {
-    if (!customApiKey.trim()) return;
-    if (!user?.token) { setCustomKeySaveError("You must be logged in to save a key."); return; }
-    setSavingCustomKey(true);
-    setCustomKeySaveError("");
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_NEXUS_ANALYZER_URL}/api/auth/keys`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", "x-sammy-token": user.token },
-        body: JSON.stringify({ CUSTOM_API_KEY: customApiKey.trim(), CUSTOM_API_URL: customApiUrl.trim() }),
-      });
-      if (!res.ok) throw new Error("Save failed");
-      setCustomKeySaved(true);
-      setExistingCustomKey(true);
-      setCustomApiKey(""); // clear field after save for security
-      setTimeout(() => setCustomKeySaved(false), 3000);
-    } catch {
-      setCustomKeySaveError("Could not save — check your connection.");
-    }
-    setSavingCustomKey(false);
-  };
+  if (!customApiKey.trim()) return;
+  if (!user?.token) { setCustomKeySaveError("You must be logged in to save a key."); return; }
+  setSavingCustomKey(true);
+  setCustomKeySaveError("");
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_NEXUS_ANALYZER_URL}/api/auth/keys`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "x-sammy-token": user.token },
+      body: JSON.stringify({
+        keys: {
+          CUSTOM_API_KEY: customApiKey.trim(),
+          CUSTOM_API_URL: customApiUrl.trim(),
+        },
+      }),
+    });
+    if (!res.ok) throw new Error("Save failed");
+    setCustomKeySaved(true);
+    setExistingCustomKey(true);
+    setCustomApiKey("");
+    setTimeout(() => setCustomKeySaved(false), 3000);
+  } catch {
+    setCustomKeySaveError("Could not save — check your connection.");
+  }
+  setSavingCustomKey(false);
+};
 
   const clearCustomKey = async () => {
-    if (!user?.token) return;
-    setClearingCustomKey(true);
-    try {
-      await fetch(`${process.env.NEXT_PUBLIC_NEXUS_ANALYZER_URL}/api/auth/keys`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", "x-sammy-token": user.token },
-        body: JSON.stringify({ CUSTOM_API_KEY: "", CUSTOM_API_URL: "" }),
-      });
-      setExistingCustomKey(false);
-      setCustomApiKey("");
-      setCustomApiUrl(API_PRESETS[selectedPreset].url);
-    } catch {}
-    setClearingCustomKey(false);
-  };
+  if (!user?.token) return;
+  setClearingCustomKey(true);
+  try {
+    await fetch(`${process.env.NEXT_PUBLIC_NEXUS_ANALYZER_URL}/api/auth/keys`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "x-sammy-token": user.token },
+      body: JSON.stringify({
+        keys: { CUSTOM_API_KEY: "", CUSTOM_API_URL: "" },
+      }),
+    });
+    setExistingCustomKey(false);
+    setCustomApiKey("");
+    setCustomApiUrl(API_PRESETS[selectedPreset].url);
+  } catch {}
+  setClearingCustomKey(false);
+};
 
   const openVaultFile = async (file: VaultFile) => {
     setLoadingView(true);
