@@ -410,7 +410,7 @@ image = "0.25"
 - [x] **User API key management** — OpenAI, Anthropic, Groq, or custom endpoint; Sam tries user key first with automatic fallback *(completed)*
 - [x] **Live portfolio dashboard** — sammyos-live.vercel.app *(completed)*
 - [x] **Silent launcher** — SammyOS.vbs + launch.py with no cmd window *(completed)*
-- [x] **Terms of Service + Privacy Policy** — Deployed at braxtonvogel.com *(completed)*
+- [x] **Terms of Service + Privacy Policy**
 
 ---
 
@@ -437,4 +437,4 @@ This is a personal portfolio project by Braxton Vogel. See [Terms of Service](ht
 
 ---
 
-*Built by Braxton Vogel — [braxtonvogel.com](https://braxtonvogel.com)*
+*Built by Braxton Vogel — [braxtonvogel.com](https://portfolio-website-w-ai.vercel.app/)*
