@@ -437,4 +437,4 @@ This is a personal portfolio project by Braxton Vogel. See [Terms of Service](ht
 
 ---
 
-*Built by Braxton Vogel — [braxtonvogel.com](https://portfolio-website-w-ai.vercel.app/)*
+*Built by Braxton Vogel — [https://portfolio-website-w-ai.vercel.app/](https://portfolio-website-w-ai.vercel.app/)*
