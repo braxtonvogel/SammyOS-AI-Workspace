@@ -162,8 +162,8 @@ async function ddgSearch(query: string): Promise<string> {
   }
 }
 
-async function braveSearch(query: string): Promise<string> {
-  const apiKey = process.env.BRAVE_API_KEY;
+async function braveSearch(query: string, braveKey?: string): Promise<string> {
+  const apiKey = braveKey || process.env.BRAVE_API_KEY;
   if (!apiKey) return "";
 
   try {
@@ -200,14 +200,14 @@ async function braveSearch(query: string): Promise<string> {
   }
 }
 
-async function webSearch(query: string): Promise<string> {
-  let results = await braveSearch(query);
+async function webSearch(query: string, braveKey?: string): Promise<string> {
+  let results = await braveSearch(query, braveKey);
   if (!results) results = await ddgSearch(query);
   if (results) return results;
 
   const simpleQuery = simplifyQuery(query);
   if (simpleQuery && simpleQuery !== query.toLowerCase().trim()) {
-    results = await braveSearch(simpleQuery);
+    results = await braveSearch(simpleQuery, braveKey);
     if (!results) results = await ddgSearch(simpleQuery);
   }
 
@@ -286,10 +286,8 @@ async function callOllama(
 export async function POST(req: Request) {
   try {
     // ── Key injection ────────────────────────────────────────────────────────
-    const userToken = req.headers.get("x-sammy-token");
-    if (userToken) {
-      await injectUserKeys(userToken);
-    }
+    const userToken = req.headers.get("x-sammy-token") ?? "";
+    const userKeys = await injectUserKeys(userToken);
 
     const {
       message,
@@ -315,12 +313,12 @@ export async function POST(req: Request) {
     if (shouldSearch(message, recentHistory.length)) {
       searchWasRun = true;
       const query = buildSearchQuery(message, recentHistory);
-      searchResults = await webSearch(query);
+      searchResults = await webSearch(query, userKeys.BRAVE_API_KEY);
       if (searchResults && activeTopic) {
         resultsAreOffTopic = !checkResultRelevance(searchResults, activeTopic);
         if (resultsAreOffTopic) {
           const topicQuery = `${activeTopic} ${simplifyQuery(message)}`.trim();
-          const retryResults = await webSearch(topicQuery);
+          const retryResults = await webSearch(topicQuery, userKeys.BRAVE_API_KEY);
           if (retryResults && checkResultRelevance(retryResults, activeTopic)) {
             searchResults = retryResults;
             resultsAreOffTopic = false;
@@ -362,12 +360,70 @@ export async function POST(req: Request) {
       content: m.content,
     }));
 
+    // ── Custom user API key (OpenAI-compatible OR Anthropic) ─────────────────
+    const customKey = userKeys.CUSTOM_API_KEY;
+    const customUrl = userKeys.CUSTOM_API_URL;
+    if (customKey && customUrl) {
+      const isAnthropic = customUrl.includes("anthropic");
+      try {
+        let reply: string | undefined;
+
+        if (isAnthropic) {
+          // Anthropic uses /v1/messages, not /chat/completions
+          const customRes = await fetch(`${customUrl}/messages`, {
+            method: "POST",
+            headers: {
+              "x-api-key": customKey,
+              "anthropic-version": "2023-06-01",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: "claude-haiku-4-5",
+              max_tokens: 1024,
+              system: systemPrompt,
+              messages: [
+                ...priorMessages,
+                { role: "user", content: message },
+              ],
+            }),
+          });
+          if (!customRes.ok) throw new Error(`Anthropic custom ${customRes.status}`);
+          const customData = await customRes.json();
+          reply = customData.content?.[0]?.text;
+        } else {
+          // OpenAI-compatible (OpenAI, etc.)
+          const customRes = await fetch(`${customUrl}/chat/completions`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${customKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: "gpt-4o-mini",
+              messages: [
+                { role: "system", content: systemPrompt },
+                ...priorMessages,
+                { role: "user", content: userContent },
+              ],
+              max_tokens: 1024,
+            }),
+          });
+          if (!customRes.ok) throw new Error(`Custom API ${customRes.status}`);
+          const customData = await customRes.json();
+          reply = customData.choices?.[0]?.message?.content;
+        }
+
+        if (reply) return Response.json({ reply, provider: "custom" });
+      } catch (err) { console.warn("Custom API failed, falling back:", err); }
+    }
+
     // ── Groq ─────────────────────────────────────────────────────────────────
+    const groqKey = userKeys.GROQ_API_KEY || process.env.GROQ_API_KEY;
     try {
       const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+          Authorization: `Bearer ${groqKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -391,6 +447,7 @@ export async function POST(req: Request) {
     }
 
     // ── Gemini ────────────────────────────────────────────────────────────────
+    const geminiKey = userKeys.GEMINI_API_KEY || process.env.GEMINI_API_KEY;
     try {
       const geminiContents: any[] = [];
       for (const m of recentHistory) {
@@ -410,7 +467,7 @@ export async function POST(req: Request) {
       });
 
       const geminiRes = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -429,11 +486,12 @@ export async function POST(req: Request) {
     }
 
     // ── Cerebras ──────────────────────────────────────────────────────────────
+    const cerebrasKey = userKeys.CEREBRAS_API_KEY || process.env.CEREBRAS_API_KEY;
     try {
       const cerebrasRes = await fetch("https://api.cerebras.ai/v1/chat/completions", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${process.env.CEREBRAS_API_KEY}`,
+          Authorization: `Bearer ${cerebrasKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
