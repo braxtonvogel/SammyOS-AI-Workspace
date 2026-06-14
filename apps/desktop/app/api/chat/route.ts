@@ -288,6 +288,8 @@ export async function POST(req: Request) {
     // ── Key injection ────────────────────────────────────────────────────────
     const userToken = req.headers.get("x-sammy-token") ?? "";
     const userKeys = await injectUserKeys(userToken);
+    console.log("USER KEYS RECEIVED:", JSON.stringify(userKeys));
+console.log("TOKEN:", userToken ? "present" : "missing");
 
     const {
       message,
@@ -516,7 +518,7 @@ export async function POST(req: Request) {
 
     return Response.json({ reply: "Sam is unavailable right now." });
   } catch (err: any) {
-    console.error(err);
-    return Response.json({ reply: "Sam is unavailable right now." }, { status: 500 });
+    console.error("CHAT ROUTE CRASH:", err?.message, err?.stack);
+    return Response.json({ reply: `DEBUG: ${err?.message}` }, { status: 500 });
   }
 }
