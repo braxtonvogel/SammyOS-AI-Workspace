@@ -1,4 +1,16 @@
-const NEXUS_URL = process.env.NEXUS_ANALYZER_URL;
+// NEXUS_ANALYZER_URL is not sensitive — it's the same public backend URL
+// already exposed client-side via NEXT_PUBLIC_NEXUS_ANALYZER_URL. Hardcoding
+// a fallback here means anyone who clones this repo gets a working app
+// without needing to set up .env.local themselves.
+const NEXUS_URL = process.env.NEXUS_ANALYZER_URL || "https://nexus-analyzer-three.vercel.app";
+
+// NOTE: NEXUS_SECRET / x-nexus-secret is currently NOT validated by the
+// /api/auth/keys route on the backend — it's sent but has no effect today.
+// Leaving it optional here rather than hardcoding it, since a hardcoded
+// secret in a public repo isn't a real secret. If you add server-side
+// validation for this header later, keep it env-only (never commit the
+// real value) — that will require anyone self-hosting nexus-analyzer to
+// set their own secret to match.
 const NEXUS_SECRET = process.env.NEXUS_SECRET;
 
 export interface UserKeys {
@@ -11,7 +23,7 @@ export interface UserKeys {
 }
 
 export async function injectUserKeys(token: string): Promise<UserKeys> {
-  if (!NEXUS_URL || !token) return {};
+  if (!token) return {};
   try {
     const res = await fetch(`${NEXUS_URL}/api/auth/keys`, {
       method: "GET",
@@ -22,7 +34,10 @@ export async function injectUserKeys(token: string): Promise<UserKeys> {
       },
       signal: AbortSignal.timeout(5000),
     });
-    if (!res.ok) return {};
+    if (!res.ok) {
+      console.warn(`injectUserKeys: /api/auth/keys returned ${res.status}`);
+      return {};
+    }
     const data = await res.json();
     const keys: UserKeys = data.keys ?? {};
 
@@ -35,7 +50,8 @@ export async function injectUserKeys(token: string): Promise<UserKeys> {
     if (keys.CUSTOM_API_URL)   process.env.CUSTOM_API_URL   = keys.CUSTOM_API_URL;
 
     return keys;
-  } catch {
+  } catch (err) {
+    console.warn("injectUserKeys failed:", err);
     return {};
   }
 }
