@@ -23,6 +23,9 @@ export default function LoginPage() {
   const [localError, setLocalError] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
+  // NEW — controls the legal document modal. null = closed.
+  const [legalModal, setLegalModal] = useState<null | "terms" | "privacy">(null);
+
   useEffect(() => {
     if (user) router.replace("/");
   }, [user, router]);
@@ -32,6 +35,16 @@ export default function LoginPage() {
     setLocalError("");
     setAgreedToTerms(false);
   }, [mode, clearError]);
+
+  // NEW — close modal on Escape key
+  useEffect(() => {
+    if (!legalModal) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLegalModal(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [legalModal]);
 
   const displayError = localError || error;
 
@@ -255,25 +268,21 @@ export default function LoginPage() {
                 </div>
                 <span style={{ fontSize: 12, color: "#666", lineHeight: 1.6 }}>
                   I agree to the{" "}
-                  <a
-                    href="https://braxtonvogel.com/sammyos-terms.html"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  {/* FIXED — was <a target="_blank">, now opens in-app modal */}
+                  <span
                     style={linkStyle}
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => { e.stopPropagation(); setLegalModal("terms"); }}
                   >
                     Terms of Service
-                  </a>
+                  </span>
                   {" "}and{" "}
-                  <a
-                    href="https://braxtonvogel.com/sammyos-privacy.html"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  {/* FIXED — was <a target="_blank">, now opens in-app modal */}
+                  <span
                     style={linkStyle}
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => { e.stopPropagation(); setLegalModal("privacy"); }}
                   >
                     Privacy Policy
-                  </a>
+                  </span>
                   . I understand this is a portfolio project provided as-is with no warranty.
                 </span>
               </label>
@@ -344,14 +353,20 @@ export default function LoginPage() {
         {/* Footer */}
         <div style={{ textAlign: "center", marginTop: 20, fontSize: 12, color: "#333" }}>
           <div style={{ marginBottom: 6 }}>
-            <a href="https://braxtonvogel.com/sammyos-terms.html" target="_blank" rel="noreferrer"
-              style={{ color: "#444", textDecoration: "none", marginRight: 16 }}>
+            {/* FIXED — was <a target="_blank">, now opens in-app modal */}
+            <span
+              onClick={() => setLegalModal("terms")}
+              style={{ color: "#444", textDecoration: "none", marginRight: 16, cursor: "pointer" }}
+            >
               Terms of Service
-            </a>
-            <a href="https://braxtonvogel.com/sammyos-privacy.html" target="_blank" rel="noreferrer"
-              style={{ color: "#444", textDecoration: "none" }}>
+            </span>
+            {/* FIXED — was <a target="_blank">, now opens in-app modal */}
+            <span
+              onClick={() => setLegalModal("privacy")}
+              style={{ color: "#444", textDecoration: "none", cursor: "pointer" }}
+            >
               Privacy Policy
-            </a>
+            </span>
           </div>
           <div>
             Built by{" "}
@@ -363,6 +378,68 @@ export default function LoginPage() {
         </div>
 
       </div>
+
+      {/* ── LEGAL DOCUMENT MODAL ── */}
+      {legalModal && (
+        <div
+          onClick={() => setLegalModal(null)}
+          style={{
+            position: "fixed", inset: 0, zIndex: 1000,
+            background: "rgba(0,0,0,0.65)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            padding: 24,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: "relative",
+              width: "100%", maxWidth: 720, height: "80vh",
+              background: "#111114",
+              border: "1px solid #2a2a2e",
+              borderRadius: 14,
+              overflow: "hidden",
+              display: "flex", flexDirection: "column",
+              boxShadow: "0 24px 80px rgba(0,0,0,0.6)",
+            }}
+          >
+            {/* Header bar with title + close button */}
+            <div style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              padding: "14px 18px",
+              borderBottom: "1px solid #1e1e22",
+              flexShrink: 0,
+            }}>
+              <span style={{ fontSize: 14, fontWeight: 600, color: "#e0e0e0" }}>
+                {legalModal === "terms" ? "Terms of Service" : "Privacy Policy"}
+              </span>
+              <button
+                onClick={() => setLegalModal(null)}
+                aria-label="Close"
+                style={{
+                  width: 28, height: 28, borderRadius: 6,
+                  background: "#1a1a1f", border: "1px solid #2a2a2e",
+                  color: "#999", cursor: "pointer",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 14, lineHeight: 1,
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <iframe
+              src={
+                legalModal === "terms"
+                  ? "https://braxtonvogel.com/sammyos-terms.html"
+                  : "https://braxtonvogel.com/sammyos-privacy.html"
+              }
+              style={{ flex: 1, border: "none", width: "100%", height: "100%", background: "#fff" }}
+              title={legalModal === "terms" ? "Terms of Service" : "Privacy Policy"}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
