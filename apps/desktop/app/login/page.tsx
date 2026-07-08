@@ -4,6 +4,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/auth-store";
+import { TERMS_OF_SERVICE, PRIVACY_POLICY } from "@/lib/legal-content";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function LoginPage() {
   const [localError, setLocalError] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
-  // NEW — controls the legal document modal. null = closed.
+  // Controls the legal document modal. null = closed.
   const [legalModal, setLegalModal] = useState<null | "terms" | "privacy">(null);
 
   useEffect(() => {
@@ -36,7 +37,7 @@ export default function LoginPage() {
     setAgreedToTerms(false);
   }, [mode, clearError]);
 
-  // NEW — close modal on Escape key
+  // Close modal on Escape key
   useEffect(() => {
     if (!legalModal) return;
     const onKey = (e: KeyboardEvent) => {
@@ -268,7 +269,6 @@ export default function LoginPage() {
                 </div>
                 <span style={{ fontSize: 12, color: "#666", lineHeight: 1.6 }}>
                   I agree to the{" "}
-                  {/* FIXED — was <a target="_blank">, now opens in-app modal */}
                   <span
                     style={linkStyle}
                     onClick={(e) => { e.stopPropagation(); setLegalModal("terms"); }}
@@ -276,7 +276,6 @@ export default function LoginPage() {
                     Terms of Service
                   </span>
                   {" "}and{" "}
-                  {/* FIXED — was <a target="_blank">, now opens in-app modal */}
                   <span
                     style={linkStyle}
                     onClick={(e) => { e.stopPropagation(); setLegalModal("privacy"); }}
@@ -353,14 +352,12 @@ export default function LoginPage() {
         {/* Footer */}
         <div style={{ textAlign: "center", marginTop: 20, fontSize: 12, color: "#333" }}>
           <div style={{ marginBottom: 6 }}>
-            {/* FIXED — was <a target="_blank">, now opens in-app modal */}
             <span
               onClick={() => setLegalModal("terms")}
               style={{ color: "#444", textDecoration: "none", marginRight: 16, cursor: "pointer" }}
             >
               Terms of Service
             </span>
-            {/* FIXED — was <a target="_blank">, now opens in-app modal */}
             <span
               onClick={() => setLegalModal("privacy")}
               style={{ color: "#444", textDecoration: "none", cursor: "pointer" }}
@@ -428,15 +425,35 @@ export default function LoginPage() {
               </button>
             </div>
 
-            <iframe
-              src={
-                legalModal === "terms"
-                  ? "https://braxtonvogel.com/sammyos-terms.html"
-                  : "https://braxtonvogel.com/sammyos-privacy.html"
-              }
-              style={{ flex: 1, border: "none", width: "100%", height: "100%", background: "#fff" }}
-              title={legalModal === "terms" ? "Terms of Service" : "Privacy Policy"}
-            />
+            {/* Content rendered locally — no network request, works offline */}
+            <div
+              style={{
+                flex: 1,
+                overflowY: "auto",
+                padding: "20px 24px",
+                fontSize: 13,
+                lineHeight: 1.7,
+                color: "#bbb",
+                whiteSpace: "pre-wrap",
+                fontFamily: "system-ui, -apple-system, sans-serif",
+              }}
+            >
+              {legalModal === "terms" ? TERMS_OF_SERVICE : PRIVACY_POLICY}
+            </div>
+
+            <div style={{
+              padding: "10px 18px",
+              borderTop: "1px solid #1e1e22",
+              fontSize: 11,
+              color: "#555",
+              flexShrink: 0,
+              textAlign: "center",
+            }}>
+              Also available online at{" "}
+              <span style={{ color: "#6366f1" }}>
+                braxtonvogel.com/{legalModal === "terms" ? "sammyos-terms.html" : "sammyos-privacy.html"}
+              </span>
+            </div>
           </div>
         </div>
       )}
