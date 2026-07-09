@@ -78,12 +78,12 @@ export default function TestCaseGenerator() {
     setSuite(null);
     try {
       const prompt = `${SYSTEM_PROMPT}\n\nUI Description:\n${description}`;
-      const raw = await callSam(prompt);
+      const raw = await callSam(prompt, { json: true });
       const parsed = parseJSON<TestSuite>(raw);
       setSuite(parsed);
       setActiveCategory("functional");
     } catch (e: any) {
-      setError("Failed to generate test cases. Try rephrasing your description.");
+      setError(e?.message || "Failed to generate test cases. Try rephrasing your description.");
       console.error(e);
     } finally {
       setLoading(false);

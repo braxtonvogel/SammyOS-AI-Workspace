@@ -253,6 +253,12 @@ ${vaultContext}
 ` : ""}
 `;
 
+// ── JSON-mode system prompt (used for structured tool calls like QA Lab) ────
+const JSON_SYSTEM_PROMPT = `You are a JSON API, not a conversational assistant.
+Respond with ONLY valid JSON matching the shape requested in the user message.
+Do not include markdown code fences, prose, explanations, or apologies.
+If you cannot fulfill the request, respond with exactly: {"error": "<short reason>"}`;
+
 interface HistoryMessage {
   role: "user" | "assistant";
   content: string;
@@ -289,30 +295,38 @@ export async function POST(req: Request) {
     const userToken = req.headers.get("x-sammy-token") ?? "";
     const userKeys = await injectUserKeys(userToken);
     console.log("USER KEYS RECEIVED:", JSON.stringify(userKeys));
-console.log("TOKEN:", userToken ? "present" : "missing");
+    console.log("TOKEN:", userToken ? "present" : "missing");
 
     const {
       message,
       imageBase64,
       history = [],
+      mode,
     }: {
       message: string;
       imageBase64?: string;
       history?: HistoryMessage[];
+      mode?: "json";
     } = await req.json();
+
+    const isJsonMode = mode === "json";
 
     const recentHistory: HistoryMessage[] = history.slice(-10);
 
-    const vaultContext = shouldInjectVault(message, recentHistory.length)
-      ? VaultStore.getContext()
-      : "";
+    // JSON mode skips vault injection entirely — structured tool calls
+    // shouldn't get vault context bleeding into the output.
+    const vaultContext =
+      !isJsonMode && shouldInjectVault(message, recentHistory.length)
+        ? VaultStore.getContext()
+        : "";
 
     let searchResults = "";
     let searchWasRun = false;
     let resultsAreOffTopic = false;
     const activeTopic = extractTopic(recentHistory);
 
-    if (shouldSearch(message, recentHistory.length)) {
+    // JSON mode skips web search entirely for the same reason.
+    if (!isJsonMode && shouldSearch(message, recentHistory.length)) {
       searchWasRun = true;
       const query = buildSearchQuery(message, recentHistory);
       searchResults = await webSearch(query, userKeys.BRAVE_API_KEY);
@@ -330,7 +344,9 @@ console.log("TOKEN:", userToken ? "present" : "missing");
       }
     }
 
-    const systemPrompt = SYSTEM_PROMPT(vaultContext, searchResults, searchWasRun);
+    const systemPrompt = isJsonMode
+      ? JSON_SYSTEM_PROMPT
+      : SYSTEM_PROMPT(vaultContext, searchResults, searchWasRun);
     const config = getProviderConfig();
 
     // ── Ollama ───────────────────────────────────────────────────────────────
@@ -516,6 +532,16 @@ console.log("TOKEN:", userToken ? "present" : "missing");
       console.warn("Cerebras failed:", err);
     }
 
+    // ── All providers failed ────────────────────────────────────────────────
+    // In JSON mode, return a structured error (non-200) so callers can
+    // distinguish "everything is down" from a real reply instead of trying
+    // to JSON.parse a human sentence.
+    if (isJsonMode) {
+      return Response.json(
+        { error: "All providers unavailable" },
+        { status: 502 }
+      );
+    }
     return Response.json({ reply: "Sam is unavailable right now." });
   } catch (err: any) {
     console.error("CHAT ROUTE CRASH:", err?.message, err?.stack);
